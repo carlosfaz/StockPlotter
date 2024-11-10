@@ -40,6 +40,33 @@ def geometric_brownian_motion(S0, T, r, sigma, num_steps):
         prices[i + 1] = prices[i] * np.exp((r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * z)
     return prices
 
+# Modelo CIR (Cox-Ingersoll-Ross)
+def cir_model(S0, T, r, sigma, kappa, theta, num_steps):
+    dt = T / num_steps
+    prices = np.zeros(num_steps + 1)
+    prices[0] = S0
+    v = np.zeros(num_steps + 1)
+    v[0] = sigma**2
+    for i in range(num_steps):
+        dz = np.random.normal(0, 1)
+        v[i + 1] = v[i] + kappa * (theta - v[i]) * dt + np.sqrt(v[i] * dt) * dz
+        v[i + 1] = max(v[i + 1], 0)  # Evitar que la volatilidad se vuelva negativa
+        prices[i + 1] = prices[i] * np.exp((r - 0.5 * v[i]) * dt + np.sqrt(v[i] * dt) * dz)
+    return prices
+
+# Modelo Vasicek (para tasas de interés)
+def vasicek_model(S0, T, r, sigma, kappa, theta, num_steps):
+    dt = T / num_steps
+    prices = np.zeros(num_steps + 1)
+    prices[0] = S0
+    v = np.zeros(num_steps + 1)
+    v[0] = r
+    for i in range(num_steps):
+        dz = np.random.normal(0, 1)
+        v[i + 1] = v[i] + kappa * (theta - v[i]) * dt + sigma * np.sqrt(dt) * dz
+        prices[i + 1] = prices[i] * np.exp((v[i] - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * dz)
+    return prices
+
 # Función para pronosticar precios
 def pronosticar_precio(ticker_symbol):
     # Crear objeto de Ticker y obtener el nombre del activo
@@ -60,8 +87,8 @@ def pronosticar_precio(ticker_symbol):
     sigma = log_returns.std() * np.sqrt(len(data))
 
     # Parámetros comunes
-    num_steps = 100 #
-    S0 = data['Close'].iloc[-1]
+    num_steps = 100  # Número de pasos en la simulación
+    S0 = data['Close'].iloc[-1]  # Precio inicial
     T = 1 / 24  # 1 día
     r = 0.01  # Tasa de interés libre de riesgo
     v0 = sigma**2  # Volatilidad inicial
@@ -69,12 +96,14 @@ def pronosticar_precio(ticker_symbol):
     theta = sigma**2  # Nivel de equilibrio
     rho = 0.1  # Correlación
 
-    # Pronósticos
+    # Pronósticos con los modelos seleccionados
     prices_heston = heston_model(S0, T, r, sigma, v0, kappa, theta, rho, num_steps)
     prices_bs = black_scholes_model(S0, T, r, sigma, num_steps)
     prices_gbm = geometric_brownian_motion(S0, T, r, sigma, num_steps)
+    prices_cir = cir_model(S0, T, r, sigma, kappa, theta, num_steps)
+    prices_vasicek = vasicek_model(S0, T, r, sigma, kappa, theta, num_steps)
 
-    return data, prices_heston, prices_bs, prices_gbm, asset_name
+    return data, prices_heston, prices_bs, prices_gbm, prices_cir, prices_vasicek, asset_name
 
 # Función especial para agregar los pronósticos a la gráfica con candlesticks
 def agregar_pronosticos_a_grafica(fig, future_times, prices_dict):
@@ -83,6 +112,8 @@ def agregar_pronosticos_a_grafica(fig, future_times, prices_dict):
         'Heston': '#00FF00',  # Verde
         'Black-Scholes': '#0000FF',  # Azul
         'GBM': '#800080',  # Morado
+        'CIR': '#FF4500',  # Naranja
+        'Vasicek': '#FFD700',  # Dorado
     }
 
     for model, prices in prices_dict.items():
@@ -153,13 +184,15 @@ def mostrar_grafica(ticker_symbol, data, prices_dict, html_filename):
 html_filename = "prediccion_precios.html"
 
 # Pronosticar precios
-data, prices_heston, prices_bs, prices_gbm, asset_name = pronosticar_precio("MXN=X")
+data, prices_heston, prices_bs, prices_gbm, prices_cir, prices_vasicek, asset_name = pronosticar_precio("MXN=X")
 
 # Crear un diccionario con los precios pronosticados
 prices_dict = {
     'Heston': prices_heston,
     'Black-Scholes': prices_bs,
-    'GBM': prices_gbm
+    'GBM': prices_gbm,
+    'CIR': prices_cir,
+    'Vasicek': prices_vasicek
 }
 
 # Mostrar gráfica
