@@ -114,18 +114,73 @@ def crear_grafica(data, weekend_jumps, periodo, intervalo, ticker_symbol, index_
 
     return fig
 
-def guardar_graficas_html(html_filename, *figs):
-    """Guarda varias gráficas en un archivo HTML de forma eficiente."""
-    with open(html_filename, 'w', encoding='utf-8') as f:  # Se especifica la codificación UTF-8
-        # Crear el índice al inicio del archivo HTML
-        f.write("<h1 id='top'>Índice de Gráficas</h1>\n")
-        f.write("<ul style='columns: 2;'>\n")  # Índice de dos columnas
+
+
+# Función optimizada para obtener la información financiera
+def get_financial_info(tickers_info):
+    financial_data = []
+    for ticker in tickers_info:
+        stock = yf.Ticker(ticker)
+        info = stock.info
         
-        # Crear enlaces al índice de los tickers
+        # Recopilando la información financiera abreviada
+        financial_info = {
+            "Ticker": ticker,
+            "P/E": info.get("trailingPE", 0),  # P/E Ratio
+            "EPS": info.get("trailingEps", 0),  # Earnings per Share
+            "Book Value": info.get("bookValue", 0),  # Book Value
+            "Div Yield": info.get("dividendYield", 0),  # Dividend Yield
+            "Div/Share": info.get("dividendRate", 0),  # Dividend per Share
+            "D/E": info.get("debtToEquity", 0),  # Debt-to-Equity Ratio
+            "Beta": info.get("beta", 0),  # Beta
+            "ROI": info.get("returnOnInvestment", 0),  # ROI
+            "ROE": info.get("returnOnEquity", 0),  # Return on Equity
+            "Vol": info.get("fiftyDayAverage", 0),  # Volatility (50-day)
+            "52W High": info.get("fiftyTwoWeekHigh", 0),  # 52 Week High
+            "52W Low": info.get("fiftyTwoWeekLow", 0),  # 52 Week Low
+        }
+
+        financial_data.append(financial_info)
+    
+    return financial_data
+
+# Formatear los valores numéricos a "1,234.56"
+def formatear_numeros(val):
+    try:
+        return f"{val:,.2f}"  # Formato de número con comas y 2 decimales
+    except:
+        return val  # Si no es un número, lo dejamos tal cual
+
+# Función para guardar las gráficas y la tabla en un archivo HTML
+def guardar_graficas_html(html_filename, *figs, df, tickers_info):
+    # Añadir la columna de nombres de los tickers
+    df['Nombre Ticker'] = df['Ticker'].map(tickers_info)  # Mapear los nombres de los tickers
+
+    # Reordenar las columnas para que 'Nombre Ticker' sea la primera
+    df = df[['Nombre Ticker'] + [col for col in df.columns if col != 'Nombre Ticker']]
+
+    # Aplicar el formato a las columnas numéricas utilizando `apply` + `map`
+    df = df.apply(lambda col: col.map(formatear_numeros) if col.dtype != 'O' else col)
+
+    # Guardar la información en HTML
+    with open(html_filename, 'w', encoding='utf-8') as f:  # Codificación UTF-8
+        # Crear el índice al inicio del archivo HTML
+        f.write("<h1 id='top'>Índice de Gráficas y Datos Financieros</h1>\n")
+        f.write("<ul style='columns: 2;'>\n")  # Índice en dos columnas
+        
+        # Crear enlaces al índice de los tickers (gráficas)
         for i, fig in enumerate(figs):
             ticker_symbol = fig.layout.title.text.split('(')[0].strip()  # Obtener el nombre sin ticker
-            f.write(f'<li><a href="#ticker{i}" style="color:blue;">{ticker_symbol}</a></li>\n')  # Acceder al texto del título
+            f.write(f'<li><a href="#ticker{i}" style="color:blue;">{ticker_symbol}</a></li>\n')
         f.write("</ul>\n\n")
+
+        # Insertar la tabla del DataFrame con la información financiera
+        f.write("<h2>Información Financiera</h2>\n")
+        
+        # Centramos la tabla usando márgenes
+        f.write("<div style='display: flex; justify-content: center;'>\n")
+        f.write(df.to_html(index=False))  # Convertir el DataFrame a HTML y eliminar el índice
+        f.write("</div>\n")  # Cierre del contenedor centrado
 
         # Guardar las gráficas con sus títulos y asignar ID a cada sección
         for i, fig in enumerate(figs):
@@ -134,8 +189,14 @@ def guardar_graficas_html(html_filename, *figs):
             f.write(fig.to_html(full_html=True, include_plotlyjs="cdn"))
             f.write(f'<br><a href="#top">Ir al inicio</a><br><br>')  # Enlace para ir al inicio
             f.write("\n")
-    
-    print(f"Las gráficas han sido guardadas en {html_filename}")
+
+    print(f"Las gráficas y la tabla han sido guardadas en {html_filename}")
+
+# Recolectar la información financiera de los tickers
+financial_data = get_financial_info(tickers_info)
+
+# Crear un DataFrame de pandas para mostrar la información en formato tabular
+df = pd.DataFrame(financial_data)
 
 # Parámetros de entrada
 html_filename = "grafico_precios_historicos.html"
@@ -155,5 +216,7 @@ for ticker in tickers_info.keys():
             figs.append(fig)
             index_id += 1
 
-# Guardar todas las gráficas juntas en un solo archivo HTML
-guardar_graficas_html(html_filename, *figs)
+# Guardar todas las gráficas y la tabla de información financiera juntas en un solo archivo HTML
+guardar_graficas_html(html_filename, *figs, df=df, tickers_info=tickers_info)
+
+
