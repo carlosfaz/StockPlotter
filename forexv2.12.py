@@ -4,40 +4,6 @@ import pandas as pd
 import time
 start_time = time.time()
 
-# Diccionario con los tickers y sus nombres completos
-
-tickers_info = {
-    "MXN=X": "FOREX USD/MXN",
-    "SPY": "SPDR S&P 500 ETF Trust",
-    "VTI": "Vanguard Total Stock Market ETF",
-    "V": "Visa Inc.",
-    "MA": "Mastercard Inc.",
-    "HSBC": "HSBC Holdings plc",
-    "JPM": "JPMorgan Chase & Co.",
-    "BAC": "Bank of America Corp.",
-    "C": "Citigroup Inc.",
-    "GS": "The Goldman Sachs Group, Inc.",
-    "MS": "Morgan Stanley",
-    "WFC": "Wells Fargo & Co.",
-    "AXP": "American Express Company",
-    "USB": "U.S. Bancorp",
-    "PNC": "PNC Financial Services",
-    "DB": "Deutsche Bank AG",
-    "ING": "ING Group",
-    "RBC": "Royal Bank of Canada",
-    "TD": "Toronto Dominion Bank",
-    "XLF": "Financial Select Sector SPDR Fund",
-    "IYF": "iShares U.S. Financials ETF",
-    "VFH": "Vanguard Financials ETF",
-    "FAS": "Direxion Daily Financial Bull 3X Shares",
-    "FAZ": "Direxion Daily Financial Bear 3X Shares",
-    "KBE": "SPDR S&P Bank ETF",
-    "KRE": "SPDR S&P Regional Banking ETF",
-    "FNCL": "Fidelity MSCI Financials Index ETF",
-    "BLK": "BlackRock, Inc.",
-    "SCHW": "Charles Schwab Corporation"
-}
-
 
 def obtener_datos(ticker_symbol, period, interval):
     """Obtiene los datos históricos de un ticker con el periodo e intervalo especificados."""
@@ -170,82 +136,133 @@ def guardar_graficas_html(html_filename, *figs, df, tickers_info):
     print(f"Las gráficas y la tabla han sido guardadas en {html_filename}")
 
 
+# Diccionario con los tickers y sus nombres completos
+tickers_info = {
+    "MXN=X": "FOREX USD/MXN",
+    "SPY": "SPDR S&P 500 ETF Trust",
+    "VTI": "Vanguard Total Stock Market ETF",
+    "V": "Visa Inc.",
+    "MA": "Mastercard Inc.",
+    "HSBC": "HSBC Holdings plc",
+    "JPM": "JPMorgan Chase & Co.",
+    "BAC": "Bank of America Corp.",
+    "C": "Citigroup Inc.",
+    "GS": "The Goldman Sachs Group, Inc.",
+    "MS": "Morgan Stanley",
+    "WFC": "Wells Fargo & Co.",
+    "AXP": "American Express Company",
+    "USB": "U.S. Bancorp",
+    "PNC": "PNC Financial Services",
+    "DB": "Deutsche Bank AG",
+    "ING": "ING Group",
+    "RBC": "Royal Bank of Canada",
+    "TD": "Toronto Dominion Bank",
+    "XLF": "Financial Select Sector SPDR Fund",
+    "IYF": "iShares U.S. Financials ETF",
+    "VFH": "Vanguard Financials ETF",
+    "FAS": "Direxion Daily Financial Bull 3X Shares",
+    "FAZ": "Direxion Daily Financial Bear 3X Shares",
+    "KBE": "SPDR S&P Bank ETF",
+    "KRE": "SPDR S&P Regional Banking ETF",
+    "FNCL": "Fidelity MSCI Financials Index ETF",
+    "BLK": "BlackRock, Inc.",
+    "SCHW": "Charles Schwab Corporation"
+}
 
-# Función optimizada para obtener la información financiera
+# Función optimizada para obtener la información financiera abreviada
 def get_financial_info(tickers_info):
     financial_data = []
     for ticker in tickers_info:
         stock = yf.Ticker(ticker)
         info = stock.info
         
-        # Recopilando la información financiera más detallada
+        # Recopilando la información financiera abreviada
         financial_info = {
             "Ticker": ticker,
             "P/E": info.get("trailingPE", 0),  # P/E Ratio
             "EPS": info.get("trailingEps", 0),  # Earnings per Share
-            "Book Value": info.get("bookValue", 0),  # Book Value
-            "Div Yield": info.get("dividendYield", 0),  # Dividend Yield
-            "Div/Share": info.get("dividendRate", 0),  # Dividend per Share
+            "BV": info.get("bookValue", 0),  # Book Value
+            "Div Yld": info.get("dividendYield", 0),  # Dividend Yield
+            "Div/Sh": info.get("dividendRate", 0),  # Dividend per Share
             "D/E": info.get("debtToEquity", 0),  # Debt-to-Equity Ratio
             "Beta": info.get("beta", 0),  # Beta
-            "ROI": info.get("returnOnInvestment", 0),  # ROI
+            "ROI": info.get("returnOnInvestment", 0),  # Return on Investment
             "ROE": info.get("returnOnEquity", 0),  # Return on Equity
             "Vol": info.get("fiftyDayAverage", 0),  # Volatility (50-day)
-            "52W High": info.get("fiftyTwoWeekHigh", 0),  # 52 Week High
-            "52W Low": info.get("fiftyTwoWeekLow", 0),  # 52 Week Low
+            "52W H": info.get("fiftyTwoWeekHigh", 0),  # 52 Week High
+            "52W L": info.get("fiftyTwoWeekLow", 0),  # 52 Week Low
             "P/B": info.get("priceToBook", 0),  # Price to Book Ratio
-            "Market Cap": info.get("marketCap", 0),  # Market Capitalization
-            "Gross Margin": info.get("grossMargins", 0),  # Gross Margin
+            "GM": info.get("grossMargins", 0),  # Gross Margin
             "ROA": info.get("returnOnAssets", 0),  # Return on Assets
-            "Operating Margin": info.get("operatingMargins", 0),  # Operating Margin
+            "OM": info.get("operatingMargins", 0),  # Operating Margin
+            "Rev Gr": info.get("revenueGrowth", 0),  # Revenue Growth
+            "PM": info.get("profitMargins", 0),  # Profit Margin
+            "EPS Gr": info.get("earningsGrowth", 0),  # EPS Growth
+            "IC": info.get("interestCoverage", 0),  # Interest Coverage
+            "CR": info.get("currentRatio", 0),  # Current Ratio
+            "NI Stab": info.get("netIncomeStability", 0),  # Net Income Stability
+            "Sec Persp": info.get("sectorPerspective", 0)  # Sector Perspective
         }
-
         financial_data.append(financial_info)
     
-    return financial_data
-
+    return pd.DataFrame(financial_data)
 
 # Función para analizar las acciones
-def analizar_acciones(df):
+def analizar_acciones(df, output_filename="resultados.txt"):
     # Definir las condiciones de filtrado y las columnas para ordenación
     filtros_y_orden = {
         'P/E alto (posiblemente sobrevaloradas)': {'condicion': df['P/E'] > 30, 'columna': 'P/E'},
-        'Alta rentabilidad por dividendo': {'condicion': df['Div Yield'] > 0.03, 'columna': 'Div Yield'},
+        'Alta rentabilidad por dividendo': {'condicion': df['Div Yld'] > 0.03, 'columna': 'Div Yld'},
         'Beta alto (riesgo elevado)': {'condicion': df['Beta'] > 1, 'columna': 'Beta'},
         'Volumen alto': {'condicion': df['Vol'] > 100, 'columna': 'Vol'},
-        'Alta volatilidad (Rango 52W alto)': {'condicion': df['52W High'] - df['52W Low'] > 100, 'columna': '52W Range'},
+        'Alta volatilidad (Rango 52W alto)': {'condicion': df['52W H'] - df['52W L'] > 100, 'columna': '52W Range'},
         'Alto riesgo (Beta > 1 y P/E > 30)': {'condicion': (df['Beta'] > 1) & (df['P/E'] > 30), 'columna': ['Beta', 'P/E']},
         'Acciones sin ganancias': {'condicion': df['P/E'] == 0, 'columna': 'P/E'},
         'Alta relación D/E (alto endeudamiento)': {'condicion': df['D/E'] > 1, 'columna': 'D/E'},
-        'Alto margen bruto': {'condicion': df['Gross Margin'] > 0.5, 'columna': 'Gross Margin'},
+        'Alto margen bruto': {'condicion': df['GM'] > 0.5, 'columna': 'GM'},
         'Bajo P/B (menos de 1)': {'condicion': df['P/B'] < 1, 'columna': 'P/B'},
-        'Alto ROE (Rentabilidad sobre el capital)': {'condicion': df['ROE'] > 0.15, 'columna': 'ROE'}
+        'Alto ROE (Rentabilidad sobre el capital)': {'condicion': df['ROE'] > 0.15, 'columna': 'ROE'},
+        'Alto Crecimiento de Ingresos': {'condicion': df['Rev Gr'] > 0.1, 'columna': 'Rev Gr'},
+        'Alto Margen Operativo': {'condicion': df['OM'] > 0.2, 'columna': 'OM'},
+        'Alta Rentabilidad sobre Activos (ROA)': {'condicion': df['ROA'] > 0.1, 'columna': 'ROA'}
     }
 
     # Crear el dataframe para la columna '52W Range' (volatilidad)
-    df['52W Range'] = df['52W High'] - df['52W Low']
+    df['52W Range'] = df['52W H'] - df['52W L']
 
-    # Iterar sobre el diccionario de filtros y ordenarlos
-    for categoria, info in filtros_y_orden.items():
-        # Aplicar el filtro
-        filtered_df = df[info['condicion']]
-        
-        # Verificar si el DataFrame filtrado está vacío
-        if filtered_df.empty:
-            print(f"\n ")
-            continue  # Saltar a la siguiente iteración si está vacío
-        
-        # Ordenar los resultados de mayor a menor
-        if isinstance(info['columna'], list):
-            filtered_df = filtered_df.sort_values(by=info['columna'], ascending=False)
-        else:
-            filtered_df = filtered_df.sort_values(by=info['columna'], ascending=False)
-        
-        # Imprimir los resultados
-        print(f"\nAcciones con {categoria}:")
-        print(filtered_df[['Nombre Ticker', *([info['columna']] if isinstance(info['columna'], str) else info['columna'])]])
+    with open(output_filename, "w", encoding="utf-8") as file:
+        # Iterar sobre el diccionario de filtros y ordenarlos
+        for categoria, info in filtros_y_orden.items():
+            # Aplicar el filtro
+            filtered_df = df[info['condicion']]
+            
+            # Verificar si el DataFrame filtrado está vacío
+            if filtered_df.empty:
+                resultado = f"\nNo se encontraron acciones para {categoria}\n"
+                print(resultado, end="")
+                file.write(resultado)
+                continue
+            
+            # Ordenar los resultados de mayor a menor
+            if isinstance(info['columna'], list):
+                filtered_df = filtered_df.sort_values(by=info['columna'], ascending=False)
+            else:
+                filtered_df = filtered_df.sort_values(by=[info['columna']], ascending=False)
+            
+            # Crear texto de resultados
+            resultado = f"\nAcciones con {categoria}:\n"
+            resultado += (
+                filtered_df[['Nombre Ticker', *(info['columna'] if isinstance(info['columna'], list) else [info['columna']])]]
+                .to_string(index=False)
+            )
+            resultado += "\n"
 
+            # Imprimir y guardar en archivo
+            print(resultado, end="")
+            file.write(resultado)
 
+# Obtener la información financiera
+financial_data = get_financial_info
 # Recolectar la información financiera de los tickers
 print(f"Consultando en Yahoo en {time.time() - start_time:.2f} segundos.")
 financial_data = get_financial_info(tickers_info)
@@ -263,7 +280,8 @@ print(f"Obteniendo data en {time.time() - start_time:.2f} segundos.")
 figs = []
 index_id = 0
 for ticker in tickers_info.keys():
-    for periodo, intervalo in [("1d", "1m"), ("1mo", "15m"), ("3mo", "1h")]:
+#    for periodo, intervalo in [("1d", "1m"), ("1mo", "15m"), ("3mo", "1h")]:
+    for periodo, intervalo in [("1d", "1m"), ("1mo", "15m")]: #version light
         data, weekend_jumps = obtener_datos(ticker, periodo, intervalo)
         if data is not None:
             # Mostrar estadísticas solo si el intervalo es de 1 minuto
