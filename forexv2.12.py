@@ -133,8 +133,8 @@ def guardar_graficas_html(html_filename, *figs, df, tickers_info):
 
     print(f"Las gráficas y la tabla han sido guardadas en {html_filename}")
 
-# Diccionario con los tickers y sus nombres completos
 tickers_info = {
+    "MXN=X": "FOREX USD/MXN",
     "SPY": "SPDR S&P 500 ETF Trust",
     "VTI": "Vanguard Total Stock Market ETF",
     "V": "Visa Inc.",
@@ -164,6 +164,7 @@ tickers_info = {
     "BLK": "BlackRock, Inc.",
     "SCHW": "Charles Schwab Corporation"
 }
+
 # Función optimizada para obtener la información financiera abreviada
 def get_financial_info(tickers_info):
     financial_data = []
@@ -225,41 +226,42 @@ def analizar_acciones(df, output_filename="resultados.txt"):
     # Crear el dataframe para la columna '52W Range' (volatilidad)
     df['52W Range'] = df['52W H'] - df['52W L']
 
+    # Función auxiliar para filtrar, limpiar y ordenar el DataFrame
+    def filtrar_y_ordenar(df, condicion, columna_orden):
+        df_filtrado = df[condicion]  # Filtrar las filas
+        df_filtrado = df_filtrado[(df_filtrado[columna_orden] != 0).all(axis=1)]  # Eliminar filas con valor 0 en columnas relevantes
+        if not df_filtrado.empty:
+            return df_filtrado.sort_values(by=columna_orden, ascending=False)
+        return None
+
+    # Función auxiliar para generar el resultado del análisis
+    def generar_resultado(categoria, df_filtrado, columnas):
+        resultado = f"\nAcciones con {categoria}:\n"
+        resultado += df_filtrado[['Nombre Ticker', *columnas]].to_string(index=False)
+        resultado += "\n"
+        return resultado
+
+    # Abrir el archivo para escribir los resultados
     with open(output_filename, "w", encoding="utf-8") as file:
         # Iterar sobre el diccionario de filtros y ordenarlos
         for categoria, info in filtros_y_orden.items():
-            # Aplicar el filtro
-            filtered_df = df[info['condicion']]
-            
-            # Excluir filas donde las columnas relevantes tienen valor 0
-            columnas_a_validar = info['columna'] if isinstance(info['columna'], list) else [info['columna']]
-            filtered_df = filtered_df[(filtered_df[columnas_a_validar] != 0).all(axis=1)]
-            
-            # Verificar si el DataFrame filtrado está vacío
-            if filtered_df.empty:
+            columna_orden = [info['columna']] if isinstance(info['columna'], str) else info['columna']
+            df_filtrado = filtrar_y_ordenar(df, info['condicion'], columna_orden)
+
+            if df_filtrado is None:
                 resultado = f"\nNo se encontraron acciones para {categoria}\n"
                 print(resultado, end="")
                 file.write(resultado)
-                continue
-            
-            # Ordenar los resultados de mayor a menor
-            if isinstance(info['columna'], list):
-                filtered_df = filtered_df.sort_values(by=info['columna'], ascending=False)
             else:
-                filtered_df = filtered_df.sort_values(by=[info['columna']], ascending=False)
-            
-            # Crear texto de resultados
-            resultado = f"\nAcciones con {categoria}:\n"
-            resultado += (
-                filtered_df[['Nombre Ticker', *columnas_a_validar]]
-                .to_string(index=False)
-            )
-            resultado += "\n"
-    
-            # Imprimir y guardar en archivo
-            print(resultado, end="")
-            file.write(resultado)
-    
+                resultado = generar_resultado(categoria, df_filtrado, columna_orden)
+                print(resultado, end="")
+                file.write(resultado)
+
+def eliminar_columnas_con_todos_ceros(df):
+    # Eliminar columnas donde todos los valores son cero
+    columnas_a_eliminar = df.columns[df.eq(0).all()]  # Identificar columnas con todos los valores 0
+    df = df.drop(columns=columnas_a_eliminar)  # Eliminar las columnas identificadas
+    return df
 
 
 # Obtener la información financiera
@@ -271,6 +273,8 @@ print(f"Listo en {time.time() - start_time:.2f} segundos.")
 
 # Crear un DataFrame de pandas para mostrar la información en formato tabular
 df = pd.DataFrame(financial_data)
+df = eliminar_columnas_con_todos_ceros(df)
+
 
 # Parámetros de entrada
 html_filename = "grafico_precios_historicos.html"
