@@ -64,10 +64,7 @@ Acciones con Alto riesgo (Beta > 1 y P/E > 30):
 Royal Bank of Canada 1.517 46.598255
      Mastercard Inc. 1.101 39.338610
 
-Acciones con Acciones sin ganancias:
-                          Nombre Ticker  P/E
-                          FOREX USD/MXN  0.0
-Direxion Daily Financial Bear 3X Shares  0.0
+No se encontraron acciones para Acciones sin ganancias
 
 Acciones con Alta relación D/E (alto endeudamiento):
                 Nombre Ticker     D/E
@@ -90,22 +87,11 @@ The Goldman Sachs Group, Inc. 0.83236
      American Express Company 0.55698
 
 Acciones con Bajo P/B (menos de 1):
-                          Nombre Ticker      P/B
-                              ING Group 0.979413
-                  Toronto Dominion Bank 0.924748
-                         Citigroup Inc. 0.677088
-                       Deutsche Bank AG 0.443718
-                          FOREX USD/MXN 0.000000
-                 SPDR S&P 500 ETF Trust 0.000000
-        Vanguard Total Stock Market ETF 0.000000
-      Financial Select Sector SPDR Fund 0.000000
-            iShares U.S. Financials ETF 0.000000
-                Vanguard Financials ETF 0.000000
-Direxion Daily Financial Bull 3X Shares 0.000000
-Direxion Daily Financial Bear 3X Shares 0.000000
-                      SPDR S&P Bank ETF 0.000000
-          SPDR S&P Regional Banking ETF 0.000000
-     Fidelity MSCI Financials Index ETF 0.000000
+        Nombre Ticker      P/B
+            ING Group 0.979413
+Toronto Dominion Bank 0.924748
+       Citigroup Inc. 0.677088
+     Deutsche Bank AG 0.443718
 
 Acciones con Alto ROE (Rentabilidad sobre el capital):
            Nombre Ticker     ROE

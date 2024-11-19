@@ -236,6 +236,10 @@ def analizar_acciones(df, output_filename="resultados.txt"):
             # Aplicar el filtro
             filtered_df = df[info['condicion']]
             
+            # Excluir filas donde las columnas relevantes tienen valor 0
+            columnas_a_validar = info['columna'] if isinstance(info['columna'], list) else [info['columna']]
+            filtered_df = filtered_df[(filtered_df[columnas_a_validar] != 0).all(axis=1)]
+            
             # Verificar si el DataFrame filtrado está vacío
             if filtered_df.empty:
                 resultado = f"\nNo se encontraron acciones para {categoria}\n"
@@ -252,14 +256,16 @@ def analizar_acciones(df, output_filename="resultados.txt"):
             # Crear texto de resultados
             resultado = f"\nAcciones con {categoria}:\n"
             resultado += (
-                filtered_df[['Nombre Ticker', *(info['columna'] if isinstance(info['columna'], list) else [info['columna']])]]
+                filtered_df[['Nombre Ticker', *columnas_a_validar]]
                 .to_string(index=False)
             )
             resultado += "\n"
-
+    
             # Imprimir y guardar en archivo
             print(resultado, end="")
             file.write(resultado)
+    
+
 
 # Obtener la información financiera
 financial_data = get_financial_info
