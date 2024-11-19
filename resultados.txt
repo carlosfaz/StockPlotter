@@ -52,12 +52,12 @@ Direxion Daily Financial Bull 3X Shares 139.2670
 
 Acciones con Alta volatilidad (Rango 52W alto):
                           Nombre Ticker  52W Range
-                        BlackRock, Inc.     356.23
+                        BlackRock, Inc.     349.61
           The Goldman Sachs Group, Inc.     272.60
-                 SPDR S&P 500 ETF Trust     149.65
-                        Mastercard Inc.     135.77
+                 SPDR S&P 500 ETF Trust     148.21
                American Express Company     135.10
-Direxion Daily Financial Bull 3X Shares     104.28
+                        Mastercard Inc.     129.71
+Direxion Daily Financial Bull 3X Shares     103.21
 
 Acciones con Alto riesgo (Beta > 1 y P/E > 30):
        Nombre Ticker  Beta       P/E

@@ -133,10 +133,8 @@ def guardar_graficas_html(html_filename, *figs, df, tickers_info):
 
     print(f"Las gráficas y la tabla han sido guardadas en {html_filename}")
 
-
 # Diccionario con los tickers y sus nombres completos
 tickers_info = {
-    "MXN=X": "FOREX USD/MXN",
     "SPY": "SPDR S&P 500 ETF Trust",
     "VTI": "Vanguard Total Stock Market ETF",
     "V": "Visa Inc.",
@@ -166,7 +164,6 @@ tickers_info = {
     "BLK": "BlackRock, Inc.",
     "SCHW": "Charles Schwab Corporation"
 }
-
 # Función optimizada para obtener la información financiera abreviada
 def get_financial_info(tickers_info):
     financial_data = []
