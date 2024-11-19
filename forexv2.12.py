@@ -85,8 +85,6 @@ def crear_grafica(data, weekend_jumps, periodo, intervalo, ticker_symbol, index_
 
     return fig
 
-
-
 # Formatear los valores numéricos a "1,234.56"
 def formatear_numeros(val):
     try:
