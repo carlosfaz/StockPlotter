@@ -1,20 +1,20 @@
 
 Acciones con P/E alto (posiblemente sobrevaloradas):
                           Nombre Ticker       P/E
-Direxion Daily Financial Bull 3X Shares 49.796930
-                   Royal Bank of Canada 46.598255
-                        Mastercard Inc. 39.338610
-                              Visa Inc. 32.115227
-             Charles Schwab Corporation 31.792969
+Direxion Daily Financial Bull 3X Shares 48.806477
+                   Royal Bank of Canada 47.081753
+                        Mastercard Inc. 39.204530
+                              Visa Inc. 32.017456
+             Charles Schwab Corporation 31.324220
 
 Acciones con Alta rentabilidad por dividendo:
          Nombre Ticker  Div Yld
-             ING Group   0.0764
- Toronto Dominion Bank   0.0524
-     HSBC Holdings plc   0.0437
-          U.S. Bancorp   0.0401
-        Citigroup Inc.   0.0317
-PNC Financial Services   0.0308
+             ING Group   0.0757
+ Toronto Dominion Bank   0.0521
+     HSBC Holdings plc   0.0431
+          U.S. Bancorp   0.0395
+        Citigroup Inc.   0.0316
+PNC Financial Services   0.0309
 
 Acciones con Beta alto (riesgo elevado):
                 Nombre Ticker  Beta
@@ -35,20 +35,20 @@ The Goldman Sachs Group, Inc. 1.342
 
 Acciones con Volumen alto:
                           Nombre Ticker      Vol
-                        BlackRock, Inc. 968.9642
-                 SPDR S&P 500 ETF Trust 575.6010
-          The Goldman Sachs Group, Inc. 518.0732
-                        Mastercard Inc. 504.1182
-                   Royal Bank of Canada 293.6602
-                              Visa Inc. 287.0282
-        Vanguard Total Stock Market ETF 284.3982
-               American Express Company 272.2946
-                   JPMorgan Chase & Co. 219.4754
-                 PNC Financial Services 188.2364
-Direxion Daily Financial Bull 3X Shares 139.2670
-                Vanguard Financials ETF 113.1530
-                         Morgan Stanley 112.5394
-            iShares U.S. Financials ETF 106.7268
+                        BlackRock, Inc. 972.4048
+                 SPDR S&P 500 ETF Trust 576.4358
+          The Goldman Sachs Group, Inc. 520.0616
+                        Mastercard Inc. 504.8090
+                   Royal Bank of Canada 294.3770
+                              Visa Inc. 287.5592
+        Vanguard Total Stock Market ETF 284.8422
+               American Express Company 272.9870
+                   JPMorgan Chase & Co. 220.0398
+                 PNC Financial Services 188.7208
+Direxion Daily Financial Bull 3X Shares 140.1154
+                Vanguard Financials ETF 113.4398
+                         Morgan Stanley 113.2514
+            iShares U.S. Financials ETF 106.9980
 
 Acciones con Alta volatilidad (Rango 52W alto):
                           Nombre Ticker  52W Range
@@ -61,8 +61,8 @@ Direxion Daily Financial Bull 3X Shares     103.21
 
 Acciones con Alto riesgo (Beta > 1 y P/E > 30):
        Nombre Ticker  Beta       P/E
-Royal Bank of Canada 1.517 46.598255
-     Mastercard Inc. 1.101 39.338610
+Royal Bank of Canada 1.517 47.081753
+     Mastercard Inc. 1.101 39.204530
 
 No se encontraron acciones para Acciones sin ganancias
 
@@ -88,10 +88,10 @@ The Goldman Sachs Group, Inc. 0.83236
 
 Acciones con Bajo P/B (menos de 1):
         Nombre Ticker      P/B
-            ING Group 0.979413
-Toronto Dominion Bank 0.924748
-       Citigroup Inc. 0.677088
-     Deutsche Bank AG 0.443718
+            ING Group 0.973866
+Toronto Dominion Bank 0.917517
+       Citigroup Inc. 0.673163
+     Deutsche Bank AG 0.435674
 
 Acciones con Alto ROE (Rentabilidad sobre el capital):
            Nombre Ticker     ROE
