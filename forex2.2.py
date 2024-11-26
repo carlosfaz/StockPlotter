@@ -86,8 +86,6 @@ def crear_grafica(data, weekend_jumps, periodo, intervalo, ticker_symbol, index_
     return fig
 
 
-
-
 # Función para formatear los valores numéricos a "1,234.56"
 def formatear_numeros(val):
     try:
@@ -229,7 +227,7 @@ def guardar_graficas_html(html_filename, df, tickers_info, *figs):
         # Insertar la tabla del DataFrame con la información financiera
         f.write("<h2>Información Financiera</h2>\n")
         
-        # Centramos la tabla usando márgenes
+        # Centramos la tabla usando márgenes #
         f.write(df.to_html(index=False))  # Convertir el DataFrame a HTML y eliminar el índice
         f.write("</div>\n")  # Cierre del contenedor centrado
 
@@ -243,8 +241,8 @@ def guardar_graficas_html(html_filename, df, tickers_info, *figs):
 
     print(f"Las gráficas y la tabla han sido guardadas en {html_filename}")
 
+
 tickers_info = {
-    "MXN=X": "FOREX USD/MXN",
     "SPY": "SPDR S&P 500 ETF Trust",
     "VTI": "Vanguard Total Stock Market ETF",
     "V": "Visa Inc.",
@@ -274,6 +272,9 @@ tickers_info = {
     "BLK": "BlackRock, Inc.",
     "SCHW": "Charles Schwab Corporation"
 }
+
+
+
 html_filename = "grafico_precios_historicos.html"
 
 # Obtener la información financiera
