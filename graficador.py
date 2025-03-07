@@ -1,3 +1,4 @@
+
 import yfinance as yf
 import pandas as pd
 import plotly.graph_objects as go
@@ -157,13 +158,22 @@ def escribir_encabezado_html(f):
 def agregar_vinculo_volver_inicio(f):
     f.write('<br><a href="#top">Volver al inicio</a><br><br>')
 
+# ------------------------------ Helpers de progreso ------------------------------
+def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=50, fill='█'):
+    percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
+    filled_length = int(length * iteration // total)
+    bar = fill * filled_length + '-' * (length - filled_length)
+    print(f'\r{prefix} |{bar}| {percent}% {suffix}', end='\r')
+    if iteration == total: 
+        print()
 
 def main():
     figs_info = []
     sector_dict = {}
     
+    total_tickers = len(tickers)  # Total de tickers
     # Obtener los tickers agrupados por sector
-    for ticker in tickers:
+    for i, ticker in enumerate(tickers):
         ticker_obj = yf.Ticker(ticker)
         sector = ticker_obj.info.get("sector", "Unknown Sector")
         long_name = ticker_obj.info.get("longName", ticker)
@@ -176,6 +186,9 @@ def main():
             if data is not None:
                 fig = crear_grafica(data, weekend_jumps, periodo, intervalo, ticker, len(figs_info))
                 sector_dict[sector].append({"fig": fig, "ticker": ticker, "long_name": long_name})
+
+        # Actualizar la barra de progreso
+        print_progress_bar(i + 1, total_tickers, prefix='Procesando tickers', suffix='Completado')
 
     # Guardar las gráficas por sector (un solo archivo HTML por sector)
     for sector, sector_figs in sector_dict.items():
