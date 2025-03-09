@@ -28,7 +28,7 @@ pip install requests pandas beautifulsoup4
 ## Uso
 Para ejecutar el script, simplemente corre el siguiente comando en la terminal:
 ```sh
-python script.py
+python yahoo_webscrapper_v0.1.py
 ```
 El script automáticamente extraerá los datos y los guardará en `stocks_data.xlsx`.
 
@@ -50,7 +50,8 @@ Cada hoja tendrá una columna adicional `Ticker`, que extrae correctamente el s�
 - Se ha incluido un `time.sleep(1)` para evitar bloqueos por exceso de solicitudes.
 - Se recomienda no ejecutar el script repetidamente en cortos períodos de tiempo para evitar restricciones de Yahoo Finance.
 
-####################################
+############################################################################################################
+
 
 # Stock Financial Analysis Tool (tabulador_excel.py)
 
@@ -84,7 +85,7 @@ pip install pandas yfinance
 ## Uso
 Para ejecutar el script, simplemente corre el siguiente comando en la terminal:
 ```sh
-python script.py
+python tabulador_excel.py
 ```
 El script leerá los tickers desde `tickers/sp500x.txt`, eliminará los inactivos desde `tickers/inactive_tickers.txt`, y procesará los datos.
 
