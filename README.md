@@ -50,7 +50,7 @@ Cada hoja tendrá una columna adicional `Ticker`, que extrae correctamente el s�
 - Se ha incluido un `time.sleep(1)` para evitar bloqueos por exceso de solicitudes.
 - Se recomienda no ejecutar el script repetidamente en cortos períodos de tiempo para evitar restricciones de Yahoo Finance.
 
-##############################################################################################################################################################################################################################################
+################################################################################################################################################################################################################################################
 
 
 
