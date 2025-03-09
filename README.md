@@ -1,4 +1,4 @@
-# Stock Data Scraper
+# Stock Data Scraper (yahoo_webscrapper_v0.1.py)
 
 Este script extrae datos financieros de Yahoo Finance y los guarda en un archivo Excel con diferentes pestañas para cada categoría de datos.
 
