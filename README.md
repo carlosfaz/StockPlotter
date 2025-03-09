@@ -1,113 +1,107 @@
 # Stock Data Scraper (yahoo_webscrapper_v0.1.py)
 
-Este script extrae datos financieros de Yahoo Finance y los guarda en un archivo Excel con diferentes pestañas para cada categoría de datos.
+This script extracts financial data from Yahoo Finance and saves it in an Excel file with different tabs for each data category.
 
-## Funcionalidades
-- Obtiene información de las siguientes categorías de acciones:
+## Features
+- Retrieves data from the following stock categories:
   - Penny Stocks
-  - Gainers (acciones en alza)
-  - Losers (acciones en baja)
-  - Most Active (acciones más activas)
-- Recorre hasta 125 registros por categoría en bloques de 25.
-- Muestra una barra de progreso en la terminal durante la extracción de datos.
-- Exporta los datos en un archivo `stocks_data.xlsx` con cada categoría en una hoja diferente.
+  - Gainers (rising stocks)
+  - Losers (declining stocks)
+  - Most Active (most traded stocks)
+- Scrapes up to 125 records per category in blocks of 25.
+- Displays a progress bar in the terminal during data extraction.
+- Exports the data to a `stocks_data.xlsx` file with each category in a separate sheet.
 
-## Requisitos
-Este script utiliza las siguientes librerías de Python:
+## Requirements
+This script uses the following Python libraries:
 - `requests`
 - `pandas`
 - `BeautifulSoup4`
 - `os`
 - `time`
 
-Asegúrate de que estas librerías estén instaladas antes de ejecutar el script. Puedes instalarlas con:
+Make sure these libraries are installed before running the script. You can install them with:
 ```sh
 pip install requests pandas beautifulsoup4
 ```
 
-## Uso
-Para ejecutar el script, simplemente corre el siguiente comando en la terminal:
+## Usage
+To run the script, simply execute the following command in the terminal:
 ```sh
 python yahoo_webscrapper_v0.1.py
 ```
-El script automáticamente extraerá los datos y los guardará en `stocks_data.xlsx`.
+The script will automatically extract the data and save it in `stocks_data.xlsx`.
 
-## Estructura del Código
-1. **`get_data_from_url(url)`**: Descarga y extrae datos de una tabla en la página web proporcionada.
-2. **`fetch_data(name, base_url)`**: Itera a través de las páginas de una categoría específica y consolida los datos.
-3. **`main()`**: Ejecuta todas las funciones, obtiene los datos de todas las categorías y los guarda en un archivo Excel.
+## Code Structure
+1. **`get_data_from_url(url)`**: Downloads and extracts data from a table on the given web page.
+2. **`fetch_data(name, base_url)`**: Iterates through pages of a specific category and consolidates the data.
+3. **`main()`**: Runs all functions, retrieves data from all categories, and saves it in an Excel file.
 
-## Salida
-El archivo `stocks_data.xlsx` contendrá:
-- **Penny Stocks** en una pestaña
-- **Gainers** en otra pestaña
-- **Losers** en otra pestaña
-- **Most Active** en otra pestaña
+## Output
+The `stocks_data.xlsx` file will contain:
+- **Penny Stocks** in one sheet
+- **Gainers** in another sheet
+- **Losers** in another sheet
+- **Most Active** in another sheet
 
-Cada hoja tendrá una columna adicional `Ticker`, que extrae correctamente el símbolo de la acción.
+Each sheet includes an additional `Ticker` column, which correctly extracts the stock symbol.
 
-## Notas
-- Se ha incluido un `time.sleep(1)` para evitar bloqueos por exceso de solicitudes.
-- Se recomienda no ejecutar el script repetidamente en cortos períodos de tiempo para evitar restricciones de Yahoo Finance.
-
-################################################################################################################################################################################################################################################
-
-
-
+## Notes
+- A `time.sleep(1)` delay has been included to prevent request blocking.
+- It is recommended not to run the script repeatedly in short timeframes to avoid Yahoo Finance restrictions.
+# ____________________________________________________________________________________________________
 # Stock Financial Analysis Tool (tabulador_excel.py)
 
-Este script obtiene información financiera de empresas listadas en el mercado utilizando Yahoo Finance y la guarda en un archivo Excel organizado por sectores.
+This script retrieves financial information of publicly traded companies using Yahoo Finance and saves it in an Excel file organized by sectors.
 
-## Funcionalidades
-- Obtiene información financiera de múltiples tickers de un archivo de texto.
-- Filtra y elimina tickers inactivos.
-- Calcula métricas clave como:
+## Features
+- Retrieves financial information for multiple tickers from a text file.
+- Filters and removes inactive tickers.
+- Calculates key financial metrics such as:
   - Revenue, Net Income, EBITDA
   - ROE, ROA, P/E, P/B, P/S
-  - Márgenes de beneficio y operativos
-  - Relación deuda/capital (D/E)
-  - Ratios financieros como Current Ratio y Quick Ratio
-  - Cobertura de intereses y PEG Ratio
-- Asigna puntajes a cada empresa en función de sus métricas.
-- Organiza los datos en un archivo Excel con pestañas por sector y una consolidada.
-- Muestra una barra de progreso en la terminal.
+  - Profit and operating margins
+  - Debt-to-equity ratio (D/E)
+  - Financial ratios like Current Ratio and Quick Ratio
+  - Interest coverage and PEG Ratio
+- Assigns a score to each company based on its financial metrics.
+- Organizes the data into an Excel file with separate sheets for each sector and a consolidated sheet.
+- Displays a progress bar in the terminal.
 
-## Requisitos
-Este script utiliza las siguientes librerías de Python:
+## Requirements
+This script uses the following Python libraries:
 - `pandas`
 - `yfinance`
 - `time`
 
-Asegúrate de que estas librerías estén instaladas antes de ejecutar el script. Puedes instalarlas con:
+Make sure these libraries are installed before running the script. You can install them with:
 ```sh
 pip install pandas yfinance
 ```
 
-## Uso
-Para ejecutar el script, simplemente corre el siguiente comando en la terminal:
+## Usage
+To run the script, simply execute the following command in the terminal:
 ```sh
 python tabulador_excel.py
 ```
-El script leerá los tickers desde `tickers/sp500x.txt`, eliminará los inactivos desde `tickers/inactive_tickers.txt`, y procesará los datos.
+The script will read tickers from `tickers/sp500x.txt`, remove inactive ones from `tickers/inactive_tickers.txt`, and process the data.
 
-## Estructura del Código
-1. **Lectura de Tickers**: Carga los tickers desde un archivo de texto y excluye los inactivos.
-2. **`obtener_informacion_financiera(tickers)`**: Obtiene métricas clave para cada empresa desde Yahoo Finance.
-3. **Puntaje de Empresas**: Se asigna un puntaje en función de métricas financieras clave.
-4. **`exportar_a_excel(info_financiera, filename)`**: Guarda los datos en un archivo Excel con pestañas por sector y una consolidada.
-5. **Ejecución del proceso**: Se muestra una barra de progreso en la terminal mientras se procesan los tickers.
+## Code Structure
+1. **Reading Tickers**: Loads tickers from a text file and excludes inactive ones.
+2. **`obtener_informacion_financiera(tickers)`**: Retrieves key metrics for each company from Yahoo Finance.
+3. **Company Scoring**: Assigns a score based on key financial metrics.
+4. **`exportar_a_excel(info_financiera, filename)`**: Saves the data into an Excel file with sector-based sheets and a consolidated sheet.
+5. **Execution Process**: Displays a progress bar in the terminal while processing tickers.
 
-## Salida
-El archivo Excel generado contiene:
-- **Una pestaña por sector**, donde se agrupan las empresas según su industria.
-- **Una pestaña consolidada** con todos los datos de las empresas.
+## Output
+The generated Excel file contains:
+- **A sheet for each sector**, grouping companies by industry.
+- **A consolidated sheet** with all companies' data.
 
-Cada hoja incluye métricas clave junto con el puntaje total asignado.
+Each sheet includes key financial metrics along with the assigned total score.
 
-## Notas
-- Se ha incluido un `time.sleep(1)` para evitar bloqueos por exceso de solicitudes.
-- El nombre del archivo Excel incluye la fecha actual para diferenciar ejecuciones.
-- La función `sanitizar_nombre(nombre)` evita errores en los nombres de las hojas de Excel.
-
-
+## Notes
+- A `time.sleep(1)` delay has been included to prevent request blocking.
+- The Excel file name includes the current date to differentiate executions.
+- The function `sanitizar_nombre(nombre)` ensures valid sheet names in Excel.
 
