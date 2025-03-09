@@ -5,20 +5,19 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import math
 
-# Crear la carpeta 'output' si no existe
-output_dir = 'output'
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
+# Constants
+OUTPUT_DIR = 'output'
+TICKERS_FILE = "tickers/mis_tickers.txt"
+TRADE_SIGNALS_LIST = []
 
-# ==>>> Lista global donde iremos guardando las señales (BUY/SELL) para luego exportar a .xlsx
-trade_signals_list = []
+def setup_environment():
+    """Create necessary directories and load tickers."""
+    if not os.path.exists(OUTPUT_DIR):
+        os.makedirs(OUTPUT_DIR)
+    df = pd.read_csv(TICKERS_FILE)
+    return df["0"].to_list()[:10]
 
-# Cargar los tickers desde el archivo .txt
-df = pd.read_csv("tickers/mis_tickers.txt")
-tickers = df["0"].to_list()[:10]  # Lista de tickers
-
-# Función para obtener los datos históricos de un ticker
-def obtener_datos(ticker_symbol, period, interval):
+def obtener_datos(ticker_symbol: str, period: str, interval: str):
     ticker = yf.Ticker(ticker_symbol)
     data = ticker.history(period=period, interval=interval)
     
@@ -26,21 +25,14 @@ def obtener_datos(ticker_symbol, period, interval):
         print(f"No se han encontrado datos para {ticker_symbol}.")
         return None, None
 
-    # Filtrar saltos mayores a 1 día
     data = data[~data.index.to_series().diff().dt.days.gt(1)]
-    
     data['Date'] = data.index.strftime('%d-%b-%Y %H:%M:%S')
     data['Delta'] = data.index.to_series().diff().dt.days.fillna(0)
     weekend_jumps = data[data['Delta'] > 1].index
 
     return data, weekend_jumps
 
-
-def calcular_indicadores(data):
-    """
-    Calcula y agrega al DataFrame las columnas de indicadores técnicos
-    (MACD, EMA, ZLEMA, SMA, etc.)
-    """
+def calcular_indicadores(data: pd.DataFrame):
     data['EMA_12'] = data['Close'].ewm(span=12, adjust=False).mean()
     data['EMA_26'] = data['Close'].ewm(span=26, adjust=False).mean()
     data['MACD'] = data['EMA_12'] - data['EMA_26']
@@ -56,33 +48,27 @@ def calcular_indicadores(data):
     data['EMA_50'] = data['Close'].ewm(span=50, adjust=False).mean()
     data['SMA_50'] = data['Close'].rolling(window=50).mean()
 
-def detectar_senales(data, ticker_symbol, long_name, sector, trade_signals_list):
-    """
-    Detecta las señales de cruce de EMA(50) y EMA(200). 
-    Registra esas señales en la lista global trade_signals_list y 
-    devuelve dos DataFrames con las filas de señal de compra y venta.
-    """
+def detectar_senales(data: pd.DataFrame, ticker_symbol: str, long_name: str, sector: str):
     data['cross_up'] = (data['EMA_50'].shift(1) <= data['EMA_200'].shift(1)) & (data['EMA_50'] > data['EMA_200'])
     data['cross_down'] = (data['EMA_50'].shift(1) >= data['EMA_200'].shift(1)) & (data['EMA_50'] < data['EMA_200'])
     
     buy_signals = data[data['cross_up']]
     sell_signals = data[data['cross_down']]
 
-    # Agregamos las señales a la lista global
     for idx in buy_signals.index:
-        trade_signals_list.append({
+        TRADE_SIGNALS_LIST.append({
             'Ticker': ticker_symbol,
             'LongName': long_name,
-            'Sector': sector,  # <--- Se agrega la columna Sector
+            'Sector': sector,
             'Date': idx,
             'Close': buy_signals.loc[idx, 'Close'],
             'Signal': 'BUY'
         })
     for idx in sell_signals.index:
-        trade_signals_list.append({
+        TRADE_SIGNALS_LIST.append({
             'Ticker': ticker_symbol,
             'LongName': long_name,
-            'Sector': sector,  # <--- Se agrega la columna Sector
+            'Sector': sector,
             'Date': idx,
             'Close': sell_signals.loc[idx, 'Close'],
             'Signal': 'SELL'
@@ -90,14 +76,7 @@ def detectar_senales(data, ticker_symbol, long_name, sector, trade_signals_list)
 
     return buy_signals, sell_signals
 
-def generar_figura(data, weekend_jumps, buy_signals, sell_signals, periodo, intervalo, ticker_symbol):
-    """
-    Crea y configura el objeto Plotly Figure con toda la información:
-    - Velas
-    - Indicadores EMA, ZLEMA, SMA
-    - Señales de compra/venta
-    - MACD
-    """
+def generar_figura(data: pd.DataFrame, weekend_jumps, buy_signals: pd.DataFrame, sell_signals: pd.DataFrame, periodo: str, intervalo: str, ticker_symbol: str):
     fig = make_subplots(
         rows=2,
         cols=1,
@@ -107,7 +86,6 @@ def generar_figura(data, weekend_jumps, buy_signals, sell_signals, periodo, inte
         subplot_titles=[f"{ticker_symbol} - Periodo: {periodo}, Intervalo: {intervalo}", "MACD"]
     )
 
-    # Fila 1: Velas, ZLEMA(14), EMA(200), EMA(50), SMA(50), Señales
     fig.add_trace(
         go.Candlestick(
             x=data['Date'],
@@ -165,7 +143,6 @@ def generar_figura(data, weekend_jumps, buy_signals, sell_signals, periodo, inte
         row=1, col=1
     )
 
-    # Líneas verticales en saltos de fin de semana
     for jump in weekend_jumps:
         fig.add_shape(
             type="line",
@@ -179,7 +156,6 @@ def generar_figura(data, weekend_jumps, buy_signals, sell_signals, periodo, inte
             row=1, col=1
         )
 
-    # Señales BUY
     fig.add_trace(
         go.Scatter(
             x=buy_signals['Date'],
@@ -190,7 +166,6 @@ def generar_figura(data, weekend_jumps, buy_signals, sell_signals, periodo, inte
         ),
         row=1, col=1
     )
-    # Señales SELL
     fig.add_trace(
         go.Scatter(
             x=sell_signals['Date'],
@@ -202,7 +177,6 @@ def generar_figura(data, weekend_jumps, buy_signals, sell_signals, periodo, inte
         row=1, col=1
     )
 
-    # Fila 2: MACD, Signal, Hist
     fig.add_trace(
         go.Scatter(
             x=data['Date'],
@@ -248,36 +222,15 @@ def generar_figura(data, weekend_jumps, buy_signals, sell_signals, periodo, inte
 
     return fig
 
-def crear_grafica(data, weekend_jumps, periodo, intervalo, ticker_symbol, index_id, long_name, sector):
-    """
-    Orquesta las llamadas a las funciones de:
-     1) Cálculo de indicadores
-     2) Detección de señales
-     3) Generación de la figura Plotly
-    """
-    # 1) Calculamos indicadores
+def crear_grafica(data: pd.DataFrame, weekend_jumps, periodo: str, intervalo: str, ticker_symbol: str, index_id: int, long_name: str, sector: str):
     calcular_indicadores(data)
+    buy_signals, sell_signals = detectar_senales(data, ticker_symbol, long_name, sector)
+    return generar_figura(data, weekend_jumps, buy_signals, sell_signals, periodo, intervalo, ticker_symbol)
 
-    # 2) Detectamos señales (pasamos el sector) y las guardamos en la lista global
-    buy_signals, sell_signals = detectar_senales(
-        data, 
-        ticker_symbol, 
-        long_name, 
-        sector, 
-        trade_signals_list
-    )
-
-    # 3) Generamos la gráfica
-    fig = generar_figura(data, weekend_jumps, buy_signals, sell_signals, periodo, intervalo, ticker_symbol)
-
-    return fig
-
-# Función para guardar las gráficas en un archivo HTML por sector
-def guardar_graficas_html_sector(figs_info, sector):
-    html_filename = os.path.join(output_dir, f'graficas_{sector}.html')
+def guardar_graficas_html_sector(figs_info: list, sector: str):
+    html_filename = os.path.join(OUTPUT_DIR, f'graficas_{sector}.html')
     with open(html_filename, 'w', encoding='utf-8') as f:
         escribir_encabezado_html(f)
-
         f.write(f'<h1>Índice de Gráficas para el Sector: {sector}</h1>\n')
         f.write('<ul style="columns: 2; list-style-type: none; padding: 0;">\n')
         for i, info in enumerate(figs_info):
@@ -285,7 +238,6 @@ def guardar_graficas_html_sector(figs_info, sector):
             long_name = info["long_name"]
             f.write(f'<li><a href="#grafico{i}">{ticker} - {long_name}</a></li>\n')
         f.write('</ul>\n')
-
         f.write('<h1>Gráficas de Precios Históricos</h1>\n')
         for i, info in enumerate(figs_info):
             fig = info["fig"]
@@ -296,9 +248,7 @@ def guardar_graficas_html_sector(figs_info, sector):
             f.write(fig.to_html(full_html=False, include_plotlyjs="cdn"))
             f.write('<br><br>\n')
             agregar_vinculo_volver_inicio(f)
-
         f.write('</body></html>\n')
-
     print(f"Las gráficas han sido guardadas en {html_filename}")
 
 def escribir_encabezado_html(f):
@@ -332,8 +282,7 @@ def escribir_encabezado_html(f):
 def agregar_vinculo_volver_inicio(f):
     f.write('<br><a href="#top">Volver al inicio</a><br><br>')
 
-# ------------------------------ Helpers de progreso ------------------------------
-def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, length=50, fill='█'):
+def print_progress_bar(iteration: int, total: int, prefix: str = '', suffix: str = '', decimals: int = 1, length: int = 50, fill: str = '█'):
     percent = ("{0:." + str(decimals) + "f}").format(100 * (iteration / float(total)))
     filled_length = int(length * iteration // total)
     bar = fill * filled_length + '-' * (length - filled_length)
@@ -342,13 +291,12 @@ def print_progress_bar(iteration, total, prefix='', suffix='', decimals=1, lengt
         print()
 
 def main():
+    tickers = setup_environment()
     sector_dict = {}
-    
-    total_tickers = len(tickers)  # Total de tickers
+    total_tickers = len(tickers)
 
     for i, ticker in enumerate(tickers):
         ticker_obj = yf.Ticker(ticker)
-        # Obtenemos el sector
         sector = ticker_obj.info.get("sector", "Unknown Sector")
         long_name = ticker_obj.info.get("longName", ticker)
 
@@ -358,41 +306,25 @@ def main():
         for periodo, intervalo in [("3mo", "1h")]:
             data, weekend_jumps = obtener_datos(ticker, periodo, intervalo)
             if data is not None:
-                # Aquí pasamos el sector a la función crear_grafica
-                fig = crear_grafica(
-                    data, 
-                    weekend_jumps, 
-                    periodo, 
-                    intervalo, 
-                    ticker, 
-                    len(sector_dict[sector]), 
-                    long_name, 
-                    sector
-                )
+                fig = crear_grafica(data, weekend_jumps, periodo, intervalo, ticker, len(sector_dict[sector]), long_name, sector)
                 sector_dict[sector].append({"fig": fig, "ticker": ticker, "long_name": long_name})
 
-        # Actualizar la barra de progreso
         print_progress_bar(i + 1, total_tickers, prefix='Procesando tickers', suffix='Completado')
 
-    # Guardar las gráficas por sector (un solo archivo HTML por sector)
     for sector, sector_figs in sector_dict.items():
         guardar_graficas_html_sector(sector_figs, sector)
 
-if __name__ == "__main__":
-    main()
-    # ==>>> Al finalizar, creamos el DataFrame con las señales y lo exportamos a Excel
-    if trade_signals_list:
-        signals_df = pd.DataFrame(trade_signals_list)
-        # Convertimos la fecha a datetime y la hacemos naive (sin timezone)
+    if TRADE_SIGNALS_LIST:
+        signals_df = pd.DataFrame(TRADE_SIGNALS_LIST)
         signals_df['Date'] = pd.to_datetime(signals_df['Date'])
         signals_df['Date'] = pd.to_datetime(signals_df['Date'].dt.strftime('%Y-%m-%d %H:%M:%S'))
         signals_df['Close'] = signals_df['Close'].round(2)
-        
-        # Ordenar de más reciente a más antiguo
         signals_df.sort_values(by='Date', ascending=False, inplace=True)
-        
-        excel_filename = os.path.join(output_dir, "buy_sell_signals.xlsx")
+        excel_filename = os.path.join(OUTPUT_DIR, "buy_sell_signals.xlsx")
         signals_df.to_excel(excel_filename, index=False)
         print(f"Archivo '{excel_filename}' creado con éxito.")
     else:
         print("No se generaron señales de Buy/Sell.")
+
+if __name__ == "__main__":
+    main()
