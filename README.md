@@ -49,7 +49,7 @@ Each sheet includes an additional `Ticker` column, which correctly extracts the 
 ## Notes
 - A `time.sleep(1)` delay has been included to prevent request blocking.
 - It is recommended not to run the script repeatedly in short timeframes to avoid Yahoo Finance restrictions.
-# _________________________________________________________________________________
+# _____________________________________________________________
 # Stock Financial Analysis Tool (tabulador_excel.py)
 
 This script retrieves financial information of publicly traded companies using Yahoo Finance and saves it in an Excel file organized by sectors.
