@@ -34,6 +34,58 @@ def fetch_data(name, base_url):
         time.sleep(1)  # Para evitar bloqueos por exceso de solicitudes
     return pd.concat(all_data, ignore_index=True) if all_data else pd.DataFrame()
 
+
+def convert_units(value):
+    if isinstance(value, str):
+        value = value.replace(',', '')
+        if 'M' in value:
+            return float(value.replace('M', '')) * 1e6
+        elif 'B' in value:
+            return float(value.replace('B', '')) * 1e9
+    return pd.to_numeric(value, errors='coerce')
+
+def clean_data(df):
+    # 1. Eliminar la primera columna sin encabezado
+    df = df.iloc[:, 1:]
+    
+    # 2. Mover la columna 'Ticker' a la derecha de 'Symbol'
+    if 'Ticker' in df.columns and 'Symbol' in df.columns:
+        cols = df.columns.tolist()
+        cols.insert(cols.index('Symbol') + 1, cols.pop(cols.index('Ticker')))
+        df = df[cols]
+    
+    # 3. Reemplazar '--' con 0
+    df.replace('--', 0, inplace=True)
+    
+    # 4. Convertir 'Price (Intraday)' a numérico
+    if 'Price (Intraday)' in df.columns:
+        df['Price (Intraday)'] = pd.to_numeric(df['Price (Intraday)'], errors='coerce')
+    
+    # 5. Limpiar la columna 'Change' y 'Change %'
+    if 'Change' in df.columns:
+        df['Change'] = df['Change'].str.replace('+', '', regex=False)
+        df['Change'] = pd.to_numeric(df['Change'], errors='coerce')
+    
+    if 'Change %' in df.columns:
+        df['Change %'] = df['Change %'].str.replace('+', '', regex=False)
+        df['Change %'] = df['Change %'].str.replace('%', '', regex=False)
+        df['Change %'] = pd.to_numeric(df['Change %'], errors='coerce') / 100
+    
+    # 6. Convertir Volume, Avg Vol (3M) y Market Cap a valores numéricos
+    for col in ['Volume', 'Avg Vol (3M)', 'Market Cap']:
+        if col in df.columns:
+            df[col] = df[col].apply(convert_units)
+    
+    # 7. Limpiar P/E Ratio (TTM)
+    if 'P/E Ratio (TTM)' in df.columns:
+        df['P/E Ratio (TTM)'] = df['P/E Ratio (TTM)'].astype(str).str.replace('+', '', regex=False)
+        df['P/E Ratio (TTM)'] = pd.to_numeric(df['P/E Ratio (TTM)'], errors='coerce')
+    
+    # 8. Eliminar columnas vacías
+    df.dropna(axis=1, how='all', inplace=True)
+    
+    return df
+
 def main():
     urls = {
         "Penny Stocks": "https://finance.yahoo.com/research-hub/screener/most_active_penny_stocks/?start={}&count=25",
@@ -49,6 +101,8 @@ def main():
             df.columns = df.columns.str.strip()
             if "Symbol" in df.columns:
                 df["Ticker"] = df["Symbol"].str.split().str[-1]
+            df = clean_data(df)
+            df.dropna(axis=1, how='all', inplace=True)
             data_frames[name] = df
     
     output_file = "stocks_data.xlsx"

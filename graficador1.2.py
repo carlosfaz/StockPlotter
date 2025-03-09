@@ -15,7 +15,7 @@ def setup_environment():
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
     df = pd.read_csv(TICKERS_FILE)
-    return df["0"].to_list()[:10]
+    return df["0"].to_list()
 
 def obtener_datos(ticker_symbol: str, period: str, interval: str):
     ticker = yf.Ticker(ticker_symbol)
