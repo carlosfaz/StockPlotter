@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import math
+import openpyxl
 
 # Constants
 OUTPUT_DIR = 'output'
@@ -15,7 +16,7 @@ def setup_environment():
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
     df = pd.read_csv(TICKERS_FILE)
-    return df["0"].to_list()
+    return df["0"].to_list()[:10]
 
 def obtener_datos(ticker_symbol: str, period: str, interval: str):
     ticker = yf.Ticker(ticker_symbol)
@@ -322,6 +323,23 @@ def main():
         signals_df.sort_values(by='Date', ascending=False, inplace=True)
         excel_filename = os.path.join(OUTPUT_DIR, "buy_sell_signals.xlsx")
         signals_df.to_excel(excel_filename, index=False)
+
+        # Autofit columns using openpyxl
+        workbook = openpyxl.load_workbook(excel_filename)
+        worksheet = workbook.active
+        for column in worksheet.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = (max_length + 2)
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+
+        workbook.save(excel_filename)
         print(f"Archivo '{excel_filename}' creado con éxito.")
     else:
         print("No se generaron señales de Buy/Sell.")
